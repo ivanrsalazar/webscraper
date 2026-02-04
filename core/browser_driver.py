@@ -60,6 +60,9 @@ class BrowserDriver:
                 '--no-sandbox',
                 '--disable-web-security',
                 '--disable-features=IsolateOrigins,site-per-process',
+                '--disable-site-isolation-trials',
+                '--ignore-certificate-errors',
+                '--host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE localhost"',
             ],
         )
 
