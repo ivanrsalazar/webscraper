@@ -1,0 +1,32 @@
+# Browser automation
+playwright==1.48.0
+playwright-stealth==1.0.6
+
+# HTTP & Parsing
+requests==2.32.5
+beautifulsoup4==4.12.3
+lxml==5.3.0
+
+# Async support
+aiohttp==3.11.0
+asyncio-throttle==1.0.1
+
+# Data handling
+pydantic==2.10.5
+
+# Configuration
+pyyaml==6.0.2
+python-dotenv==1.0.1
+
+# Utilities
+tenacity==9.0.0
+fake-useragent==1.5.1
+
+# Logging & Monitoring
+structlog==24.4.0
+tqdm==4.67.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+responses==0.25.3

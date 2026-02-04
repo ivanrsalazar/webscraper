@@ -1,0 +1,173 @@
+# Walmart scraper configuration
+site:
+  name: walmart
+  base_url: https://www.walmart.com
+  requires_js: true
+
+# Location/zipcode setting
+location:
+  method: cookie  # cookie-based location modal
+  selectors:
+    # Triggers to open location modal
+    location_button:
+      - 'button[data-automation-id="header-delivery-selector"]'
+      - 'button[aria-label="Update location"]'
+      - '[data-testid="location-button"]'
+
+    # Zipcode input field
+    zipcode_input:
+      - 'input[name="zipcode"]'
+      - 'input[name="postal-code"]'
+      - 'input[aria-label="Zip code"]'
+      - 'input[placeholder="Zip code"]'
+
+    # Submit button
+    submit_button:
+      - 'button[type="submit"]'
+      - 'button[data-automation-id="location-update-button"]'
+      - 'button:has-text("Update")'
+
+  # Validation
+  validation:
+    selectors:
+      - 'button[data-automation-id="header-delivery-selector"]'
+      - '[data-testid="store-location-text"]'
+
+# Product search
+search:
+  url_template: "https://www.walmart.com/search?q={query}&page={page}"
+  pagination:
+    type: load_more  # Walmart uses "Load More" button
+    max_pages: 10
+    load_more_button:
+      - 'button[link-identifier="loadMore"]'
+      - 'button:has-text("Load more")'
+
+  selectors:
+    # Product cards in search results
+    product_cards:
+      - '[data-testid="list-view"]'
+      - '[data-item-id]'
+      - '.search-result-gridview-item'
+
+    # Product link within card
+    product_link:
+      - 'a[link-identifier="item-page-title"]'
+      - 'a[data-testid="product-title-link"]'
+
+# Product details page
+product:
+  selectors:
+    # Product name/title
+    name:
+      - 'h1[itemprop="name"]'
+      - 'h1[data-testid="product-title"]'
+      - 'h1.prod-ProductTitle'
+
+    # Current/sale price
+    current_price:
+      - 'span[itemprop="price"]'
+      - '[data-testid="price-current"]'
+      - '.price-group .price-characteristic'
+      - 'span.price-current'
+
+    # Original price (before discount)
+    original_price:
+      - 'span[data-testid="price-was"]'
+      - 'span.price-strikethrough'
+      - '.price-group .price-was'
+
+    # Availability/stock status
+    stock_status:
+      - '[data-testid="fulfillment-options"]'
+      - '[data-automation-id="fulfillment-availability"]'
+      - '.prod-fulfillment-options'
+
+    # Brand
+    brand:
+      - 'span[itemprop="brand"]'
+      - '[data-testid="product-brand"]'
+      - '.prod-brand'
+
+    # Model number
+    model:
+      - 'span[itemprop="model"]'
+      - '.prod-model-number'
+
+    # Rating average
+    rating_avg:
+      - 'span[itemprop="ratingValue"]'
+      - '[data-testid="rating-value"]'
+      - '.average-rating'
+
+    # Rating count
+    rating_count:
+      - 'span[itemprop="reviewCount"]'
+      - '[data-testid="review-count"]'
+      - '.rating-count'
+
+    # Reviews summary
+    review_summary:
+      - '[data-testid="reviews-summary"]'
+      - '.review-summary'
+
+    # Shipping info
+    shipping_cost:
+      - '[data-testid="shipping-cost"]'
+      - '.shipping-price'
+
+    free_shipping:
+      - 'span:has-text("Free shipping")'
+      - '[data-testid="free-shipping"]'
+
+    delivery_date:
+      - '[data-testid="delivery-date"]'
+      - '.delivery-estimate'
+
+    # Product specs table
+    specs_table:
+      - 'table[data-testid="specifications"]'
+      - '.product-specification'
+      - 'div[data-testid="product-details"]'
+
+    # Description
+    description:
+      - '[data-testid="product-description"]'
+      - 'div[itemprop="description"]'
+      - '.about-product'
+
+    # Images
+    images:
+      - 'img[data-testid="product-image"]'
+      - 'img.prod-hero-image'
+      - 'div[data-testid="media-gallery"] img'
+
+    # Product ID
+    product_id:
+      - 'meta[itemprop="productID"]'
+      - '[data-product-id]'
+
+# Rate limiting configuration
+rate_limiting:
+  requests_per_minute: 10
+  min_delay_seconds: 2
+  max_delay_seconds: 5
+  backoff_multiplier: 2.0
+
+# Anti-bot configuration
+anti_bot:
+  rotate_user_agent: true
+  use_cookies: true
+  stealth_mode: true
+
+# Cache configuration
+cache:
+  enabled: true
+  ttl_hours: 24
+
+# Retry configuration
+retry:
+  max_attempts: 3
+  initial_delay: 5
+  exponential_base: 2
+  max_delay: 60
