@@ -22,6 +22,7 @@ class BrowserDriver:
         headless: bool = True,
         user_agent: Optional[str] = None,
         viewport: Optional[Dict[str, int]] = None,
+        browser_type: str = 'firefox',  # Changed default to firefox
     ):
         """
         Initialize browser driver.
@@ -30,10 +31,12 @@ class BrowserDriver:
             headless: Run browser in headless mode (default: True)
             user_agent: Custom user agent string (default: None = use default)
             viewport: Custom viewport size dict with 'width' and 'height' (default: 1920x1080)
+            browser_type: Browser to use ('chromium', 'firefox', 'webkit') (default: 'firefox')
         """
         self.headless = headless
         self.user_agent = user_agent
         self.viewport = viewport or {'width': 1920, 'height': 1080}
+        self.browser_type = browser_type
 
         # Playwright instances
         self.playwright = None
@@ -51,20 +54,31 @@ class BrowserDriver:
         # Start Playwright
         self.playwright = await async_playwright().start()
 
-        # Launch browser with anti-detection args
-        self.browser = await self.playwright.chromium.launch(
-            headless=self.headless,
-            args=[
-                '--disable-blink-features=AutomationControlled',
-                '--disable-dev-shm-usage',
-                '--no-sandbox',
-                '--disable-web-security',
-                '--disable-features=IsolateOrigins,site-per-process',
-                '--ignore-certificate-errors',
-            ],
-            # Use system DNS servers
-            chromium_sandbox=False,
-        )
+        # Select browser engine
+        if self.browser_type == 'firefox':
+            # Firefox: Better DNS resolution, more stable
+            self.browser = await self.playwright.firefox.launch(
+                headless=self.headless,
+            )
+        elif self.browser_type == 'webkit':
+            # WebKit (Safari engine)
+            self.browser = await self.playwright.webkit.launch(
+                headless=self.headless,
+            )
+        else:
+            # Chromium: More features but DNS issues on some systems
+            self.browser = await self.playwright.chromium.launch(
+                headless=self.headless,
+                args=[
+                    '--disable-blink-features=AutomationControlled',
+                    '--disable-dev-shm-usage',
+                    '--no-sandbox',
+                    '--disable-web-security',
+                    '--disable-features=IsolateOrigins,site-per-process',
+                    '--ignore-certificate-errors',
+                ],
+                chromium_sandbox=False,
+            )
 
         # Create context with custom settings
         context_options = {
@@ -81,8 +95,12 @@ class BrowserDriver:
         # Create page
         self.page = await self.context.new_page()
 
-        # Apply stealth mode to hide automation
-        await stealth_async(self.page)
+        # Apply stealth mode to hide automation (works best with Chromium)
+        if self.browser_type == 'chromium':
+            try:
+                await stealth_async(self.page)
+            except Exception:
+                pass  # Stealth mode optional, continue anyway
 
     async def get(
         self,
